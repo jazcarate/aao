@@ -3,6 +3,10 @@
 
 _Pending..._
 
+### Limitations
+Cannot tag primitive, array or final types.
+
+
 ### TODO
 - [] 👆 Readme
 - [] Annotation to ignore tags
