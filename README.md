@@ -4,10 +4,11 @@
 _Pending..._
 
 ### Limitations
-Cannot tag primitive, array or final types.
+Cannot tag primitive, array or final types. (because JVM rules)
 
 
 ### TODO
 - [] 👆 Readme
 - [] Annotation to ignore tags
-- [] DLS for tags (what can be combines with what? Wildcards?)
+- [] Better way to visualize in the debugger the original object
+- [] Tags namespaces

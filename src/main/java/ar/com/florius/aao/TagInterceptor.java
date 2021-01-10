@@ -9,17 +9,24 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
+import static ar.com.florius.aao.Tag.GLOBAL_NAMESPACE;
 import static ar.com.florius.aao.Tag.tag;
 
 public class TagInterceptor<T> {
-    final Logger log = LoggerFactory.getLogger(TagInterceptor.class);
+    final Logger logger = LoggerFactory.getLogger(Tag.class);
     private final T original;
-    private final String tagName;
+    private final Map<String, String> namespace;
+
+
+    public TagInterceptor(T original, String namespace, String tag) {
+        this.original = original;
+        this.namespace = Map.of(namespace, tag);
+    }
 
     public TagInterceptor(T original, String tag) {
-        this.original = original;
-        this.tagName = tag;
+        this(original, GLOBAL_NAMESPACE, tag);
     }
 
     @RuntimeType
@@ -27,23 +34,45 @@ public class TagInterceptor<T> {
     public Object intercept(@Origin Method method, @AllArguments Object[] args) throws Exception {
         switch (method.getName()) {
             case "getTag":
-                return this.tagName;
+                if (args.length == 0) {
+                    return this.namespace.get(GLOBAL_NAMESPACE);
+                } else {
+                    return this.namespace.get((String) args[0]);
+                }
             case "getUnTag":
                 return this.original;
+            case "getNamespace":
+                return this.namespace;
             default:
-                return methodMissing(method, args);
+                return dispatch(method, args);
         }
     }
 
-    private Object methodMissing(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+    private Object dispatch(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        checkArgsTags(args);
+
         Object result = method.invoke(this.original, args);
         TypeDescription resultType = TypeDescription.ForLoadedType.of(result.getClass());
 
         if (resultType.isPrimitive() || resultType.isArray() || resultType.isFinal()) {
-            log.warn("Cannot tag primitive, array or final types ({}). Returning untagged ({})", resultType, result);
+            logger.warn("Cannot tag primitive, array or final types ({}). Returning untagged ({})", resultType, result);
             return result;
         } else {
-            return tag(result, this.tagName);
+            return tag(result, "TODO");
         }
+    }
+
+    private void checkArgsTags(Object[] args) throws IncompatibleTagsException {
+        /*Arrays.stream(args)
+                .map(Tag::safeToTaggable)
+                .filter(Optional::isPresent)
+                .filter()
+        culprit.ifPresent(o -> {
+            throw new IncompatibleTagsException();
+        });*/
+    }
+
+    private boolean isCompatible(Object o) {
+        return false;
     }
 }

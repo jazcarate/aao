@@ -8,7 +8,7 @@ import static ar.com.florius.aao.Tag.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class TagTest {
+class SafeTagTest {
 
     @Test
     void tagging_get_tags() {
