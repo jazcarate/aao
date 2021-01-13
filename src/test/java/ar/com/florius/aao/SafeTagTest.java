@@ -4,7 +4,7 @@ import ar.com.florius.aao.shapes.State;
 import ar.com.florius.aao.shapes.Unary;
 import org.junit.jupiter.api.Test;
 
-import static ar.com.florius.aao.Tag.*;
+import static ar.com.florius.aao.SafeTag.tag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -14,38 +14,30 @@ class SafeTagTest {
     void tagging_get_tags() {
         String aTag = "foo";
 
-        State<Integer> taggedState = tag(new State<>(3), aTag);
+        Taggable<State<Integer>> taggedState = tag(new State<>(3), aTag);
 
-        assertEquals(getTag(taggedState), aTag);
+        assertEquals(taggedState.getTag(), aTag);
     }
 
     @Test
     void tagging_can_unbox() {
         State<Integer> original = new State<>(3);
-        State<Integer> taggedState = tag(original, "foo");
+        Taggable<State<Integer>> taggedState = tag(original, "foo");
 
-        assertEquals(untag(taggedState), original);
+        assertEquals(taggedState.getUnTag(), original);
     }
 
-
-    @Test
-    void tag_is_equal_to_untagged() {
-        State<Integer> original = new State<>(3);
-        State<Integer> tagged = tag(original, "foo");
-
-        assertEquals(tagged, original);
-    }
 
     @Test
     void tag_an_already_tagged_thing() {
         String aTag = "foo";
 
-        State<Integer> taggedState = tag(new State<>(3), aTag);
-        State<Integer> reTaggedState = tag(taggedState, aTag);
+        Taggable<State<Integer>> taggedState = tag(new State<>(3), aTag);
+        Taggable<State<Integer>> reTaggedState = tag(taggedState, aTag);
 
         assertEquals(taggedState, reTaggedState);
-        assertEquals(getTag(taggedState), aTag);
-        assertEquals(getTag(reTaggedState), aTag);
+        assertEquals(taggedState.getTag(), aTag);
+        assertEquals(reTaggedState.getTag(), aTag);
     }
 
     @Test
@@ -97,4 +89,5 @@ class SafeTagTest {
 
         assertThrows(IncompatibleTagsException.class, () -> taggedUnary.operate(result));
     }
+
 }

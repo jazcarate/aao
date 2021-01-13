@@ -9,6 +9,6 @@ Cannot tag primitive, array or final types. (because JVM rules)
 
 ### TODO
 - [] 👆 Readme
-- [] Annotation to ignore tags
+- [] A way to explicity ignore tags
 - [] Better way to visualize in the debugger the original object
-- [] Tags namespaces
+- [] Tags and namespaces are Semigruos. Import arrow?

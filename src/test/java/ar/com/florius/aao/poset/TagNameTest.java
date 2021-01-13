@@ -14,7 +14,7 @@ class TagNameTest {
         TagName foo = new TagName("foo");
         TagName bar = new TagName("bar");
 
-        assertMin(foo, bar);
+        assertIncompatible(foo, bar);
     }
 
     @Test
@@ -22,8 +22,8 @@ class TagNameTest {
         TagName foo1 = new TagName("foo");
         TagName foo2 = new TagName("foo");
 
-        assertCommon(foo1, foo2, foo1);
-        assertCommon(foo1, foo2, foo2);
+        assertMappend(foo1, foo2, foo1);
+        assertMappend(foo1, foo2, foo2);
     }
 
     @Test
@@ -31,7 +31,7 @@ class TagNameTest {
         TagName foo = new TagName("foo");
         TagName fooBar = new TagName("foo:bar");
 
-        assertCommon(foo, fooBar, fooBar);
+        assertMappend(foo, fooBar, fooBar);
     }
 
     @Test
@@ -39,7 +39,7 @@ class TagNameTest {
         TagName foo = new TagName("foo:biz");
         TagName fooBar = new TagName("foo:bar");
 
-        assertMin(foo, fooBar);
+        assertIncompatible(foo, fooBar);
     }
 
     @Test
@@ -48,7 +48,7 @@ class TagNameTest {
         TagName bar = new TagName("bar");
 
 
-        assertMin(biz, bar);
+        assertIncompatible(biz, bar);
     }
 
     private void assertCommutative(TagName a, TagName b, BiConsumer<TagName, TagName> assertion) {
@@ -56,15 +56,15 @@ class TagNameTest {
         assertion.accept(b, a);
     }
 
-    private void assertCommon(TagName a, TagName b, TagName result) {
+    private void assertMappend(TagName a, TagName b, TagName result) {
         assertCommutative(a, b, (x, y) ->
-                assertEquals(x.common(y), result)
+                assertEquals(x.mappend(y), result)
         );
     }
 
-    private void assertMin(TagName a, TagName b) {
+    private void assertIncompatible(TagName a, TagName b) {
         assertCommutative(a, b, (x, y) ->
-                assertThrows(IncompatibleTagsException.class, () -> x.common(y))
+                assertThrows(IncompatibleTagsException.class, () -> x.mappend(y))
         );
     }
 }
