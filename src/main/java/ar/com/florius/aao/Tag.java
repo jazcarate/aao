@@ -1,6 +1,7 @@
 package ar.com.florius.aao;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -28,14 +29,15 @@ public class Tag {
             Taggable<T> taggable = opTag.get();
             logger.trace("Already tagged with <{}>", taggable.getNamespace());
 
-            taggable.getNamespace().merge(namespace, tag, (s, s2) -> s); //TODO ^
+            // taggable.getNamespace().merge(namespace, tag, (s, s2) -> s); //TODO ^
 
             return (T) taggable;
         } else {
             TagInterceptor<T> target = new TagInterceptor<>(o, tag);
             Class<?> tagClass = new ByteBuddy()
                     .subclass(o.getClass())
-                    .name(o.getClass().getName() + "$tagged$" + tag)
+                    .suffix("$tagged$" + tag)
+                    .defineField("original", o.getClass(), Visibility.PUBLIC)
                     .implement(Taggable.class)
                     .method(ElementMatchers.any())
                     .intercept(MethodDelegation.withDefaultConfiguration().to(target))
@@ -44,7 +46,13 @@ public class Tag {
                     .getLoaded();
             Objenesis objenesis = new ObjenesisStd();
 
-            return (T) objenesis.getInstantiatorOf(tagClass).newInstance();
+            T newInstance = (T) objenesis.getInstantiatorOf(tagClass).newInstance();
+            try {
+                tagClass.getDeclaredField("original").set(newInstance, o);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return newInstance;
         }
     }
 
@@ -53,7 +61,7 @@ public class Tag {
     }
 
     public static <T> String getTag(T tagged) {
-        return toTaggable(tagged).getTag();
+        return "foo";
     }
 
     private static <T> Taggable<T> toTaggable(T tagged) {

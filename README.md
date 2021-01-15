@@ -6,9 +6,9 @@ _Pending..._
 ### Limitations
 Cannot tag primitive, array or final types. (because JVM rules)
 
+## Topless joined semi-lattice.
 
 ### TODO
 - [] 👆 Readme
 - [] A way to explicity ignore tags
-- [] Better way to visualize in the debugger the original object
 - [] Tags and namespaces are Semigruos. Import arrow?

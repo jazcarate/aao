@@ -1,13 +1,9 @@
 package ar.com.florius.aao;
 
-import java.util.Map;
+import ar.com.florius.aao.poset.Namespace;
 
 public interface Taggable<T> {
-    String getTag();
-
-    String getTag(String namespace);
-
-    Map<String, String> getNamespace();
+    Namespace getNamespace();
 
     T getUnTag();
 }
