@@ -1,5 +1,6 @@
 package ar.com.florius.aao;
 
+import ar.com.florius.aao.semilattice.TagName;
 import ar.com.florius.aao.shapes.State;
 import ar.com.florius.aao.shapes.Unary;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ class TagTest {
 
     @Test
     void tagging_get_tags() {
-        String aTag = "foo";
+        TagName aTag = new TagName.Tagged("foo");
 
         State<Integer> taggedState = tag(new State<>(3), aTag);
 
@@ -38,14 +39,14 @@ class TagTest {
 
     @Test
     void tag_an_already_tagged_thing() {
-        String aTag = "foo";
+        TagName aTag = new TagName.Tagged("foo");
 
         State<Integer> taggedState = tag(new State<>(3), aTag);
         State<Integer> reTaggedState = tag(taggedState, aTag);
 
-        assertEquals(taggedState, reTaggedState);
         assertEquals(getTag(taggedState), aTag);
         assertEquals(getTag(reTaggedState), aTag);
+        assertEquals(taggedState, reTaggedState);
     }
 
     @Test
@@ -53,14 +54,12 @@ class TagTest {
 
         State<Integer> taggedState = tag(new State<>(3), "foo");
 
-        assertThrows(IncompatibleTagsException.class, () -> {
-            tag(taggedState, "bar");
-        });
+        assertThrows(IncompatibleTagsException.class, () -> tag(taggedState, "bar"));
     }
 
     @Test
     void result_of_tag_is_tagged_with_the_parent() {
-        String aTag = "foo";
+        TagName aTag = new TagName.Tagged("foo");
         State<State<Integer>> taggedState = tag(new State<>(new State<>(3)), aTag);
 
         assertEquals(getTag(taggedState.get()), aTag);
@@ -68,7 +67,7 @@ class TagTest {
 
     @Test
     void tagged_can_interact_with_untagged_and_result_is_tagged() {
-        String aTag = "foo";
+        TagName aTag = new TagName.Tagged("foo");
         Unary taggedUnary = tag(new Unary(), aTag);
 
         State<Integer> result = new State<>(3);
@@ -80,7 +79,7 @@ class TagTest {
 
     @Test
     void tagged_can_interact_with_same_tag_and_result_is_tagged() {
-        String aTag = "foo";
+        TagName aTag = new TagName.Tagged("foo");
         Unary taggedUnary = tag(new Unary(), aTag);
 
         State<Integer> result = tag(new State<>(3), aTag);

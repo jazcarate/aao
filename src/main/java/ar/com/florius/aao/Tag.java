@@ -1,5 +1,6 @@
 package ar.com.florius.aao;
 
+import ar.com.florius.aao.semilattice.TagName;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
@@ -10,34 +11,35 @@ import org.objenesis.ObjenesisStd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 public class Tag {
-    public static final String GLOBAL_NAMESPACE = "*";
     static final Logger logger = LoggerFactory.getLogger(Tag.class);
 
     public static <T> T tag(T o, String tag) {
-        return tag(o, GLOBAL_NAMESPACE, tag);
+        return tag(o, new TagName.Tagged(tag));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T tag(T o, String namespace, String tag) {
-        logger.trace("Tagging <{}> ({}) in {} with <{}>", o, o.getClass().getSimpleName(), namespace, tag);
+    public static <T> T tag(T o, TagName tag) {
+        logger.trace("Tagging <{}> in {} with <{}>", o, o.getClass().getSimpleName(), tag);
 
+        SafeTag<T> thisSafe = new SafeTag<>(o, tag);
         Optional<Taggable<T>> opTag = safeToTaggable(o);
         if (opTag.isPresent()) {
             Taggable<T> taggable = opTag.get();
-            logger.trace("Already tagged with <{}>", taggable.getNamespace());
+            logger.trace("Already tagged with <{}>", taggable.getTag());
 
-            // taggable.getNamespace().merge(namespace, tag, (s, s2) -> s); //TODO ^
-
-            return (T) taggable;
+            TagName newTag = thisSafe.operate(List.of(taggable.getTag()));
+            return tag(taggable.getValue(), newTag);
         } else {
-            TagInterceptor<T> target = new TagInterceptor<>(o, tag);
+            TagInterceptor<T> target = new TagInterceptor<>(thisSafe);
             Class<?> tagClass = new ByteBuddy()
                     .subclass(o.getClass())
-                    .suffix("$tagged$" + tag)
+                    .suffix("$tagged")
                     .defineField("original", o.getClass(), Visibility.PUBLIC)
+                    .defineField("tag", TagName.class, Visibility.PUBLIC)
                     .implement(Taggable.class)
                     .method(ElementMatchers.any())
                     .intercept(MethodDelegation.withDefaultConfiguration().to(target))
@@ -49,6 +51,7 @@ public class Tag {
             T newInstance = (T) objenesis.getInstantiatorOf(tagClass).newInstance();
             try {
                 tagClass.getDeclaredField("original").set(newInstance, o);
+                tagClass.getDeclaredField("tag").set(newInstance, tag);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -57,11 +60,11 @@ public class Tag {
     }
 
     public static <T> T untag(T tagged) {
-        return toTaggable(tagged).getUnTag();
+        return toTaggable(tagged).getValue();
     }
 
-    public static <T> String getTag(T tagged) {
-        return "foo";
+    public static <T> TagName getTag(T tagged) {
+        return toTaggable(tagged).getTag();
     }
 
     private static <T> Taggable<T> toTaggable(T tagged) {

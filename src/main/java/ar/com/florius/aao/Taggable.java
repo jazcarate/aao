@@ -1,9 +1,9 @@
 package ar.com.florius.aao;
 
-import ar.com.florius.aao.poset.Namespace;
+import ar.com.florius.aao.semilattice.TagName;
 
 public interface Taggable<T> {
-    Namespace getNamespace();
+    TagName getTag();
 
-    T getUnTag();
+    T getValue();
 }
