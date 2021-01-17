@@ -2,7 +2,6 @@
 
 ## [Apples and oranges](https://en.wikipedia.org/wiki/Apples_and_oranges)
 
-
 ```kotlin
 val fiveApples: BigDecimal = tag(BigDecimal(5), "apple")
 val fiveOranges: BigDecimal = tag(BigDecimal(5), "orange")
@@ -69,6 +68,22 @@ class SomeComputation {
 }
 ```
 
+This way we can safely operate with tagged things, with no extra overhead in the types.
+
+```kotlin
+val toll: BigDecimal = tag(dataFromSomeService.getTollValue(), "taxed")
+val tip: BigDecimal = dataFromAnotherService.getTipValue()
+val tax: BigDecimal = tag(BigDecimal.valueOf(0.21), "taxed")
+
+toll + (tax * tip) // This is now Ok!
+```
+
+The result itself is also tagged with the most specific of the tags. Refer to [Tag laws](#tag-laws) for a more in depth
+understanding of what "most specific" means.
+
+So in this example, tip is not tagged with anything, but after doing `tip * tax`, te result will get tagged
+with `"taxed"`, and now it can be operated (`+`) with `toll` that is `"taxed"` tagged.
+
 ### Opting out
 
 **TBD**
@@ -79,10 +94,12 @@ Let me start this with a simple, yet powerful quote:
 > There are no zero-cost abstractions.
 
 What I tried to achieve here is that the tagging “meta world” can be disabled, incurring in the cost of a really naive
-function call:
+function call
+if [assertion status](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html#desiredAssertionStatus())
+is turned off.
 
 ```kotlin
-inline fun <T : Any> tag(o: T, _: String) = o
+fun <T : Any> tag(o: T, _: String) = o
 ```
 
 ### Import
@@ -91,8 +108,8 @@ inline fun <T : Any> tag(o: T, _: String) = o
 
 ### Tag laws
 
-**[Joined semilattice](https://en.wikipedia.org/wiki/Semilattice)** is the name of the game when it comes to
-tag. There are three “layers” of semilattices interacting in tags. In reverse order of application:
+**[Joined semilattice](https://en.wikipedia.org/wiki/Semilattice)** is the name of the game when it comes to tag. There
+are three “layers” of semilattices interacting in tags. In reverse order of application:
 
 1. **`TagName`** A string representation of the tag itself, where dissimilar values yield ⊤
 1. **`Breadcrumb`** A ordered set of `TagName` that are joined by position wise join, where an intermediate ⊤ _bubbles_
@@ -164,7 +181,9 @@ fun <T : Any> tag(o: T, tag: String): T
 
 ### Limitations
 
-Cannot tag primitive, array or final types. (because JVM rules)
+1. Cannot tag primitive, array or final types (because JVM rules)
+2. Objects that use raw fields (and not methods) will bypass any _magic_ `aao` is able to do
+3. Untagged objects interacting with tagged objects bypass `aao`
 
 ### TODO
 

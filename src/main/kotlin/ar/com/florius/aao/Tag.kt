@@ -11,6 +11,9 @@ import org.objenesis.ObjenesisStd
 import org.slf4j.LoggerFactory
 import java.util.*
 
+private const val FIELD_ORIGINAL = "aao_original"
+private const val FIELD_TAG = "aao_tag"
+
 object Tag {
     private val logger = LoggerFactory.getLogger(Tag::class.java)
 
@@ -21,6 +24,10 @@ object Tag {
 
     @JvmStatic
     fun <T : Any> tag(o: T, tag: TagName): T {
+        if (!o.javaClass.desiredAssertionStatus()) {
+            return o
+        }
+
         logger.trace("Tagging <{}> in {} with <{}>", o, o.javaClass.simpleName, tag)
         val thisSafe = SafeTag(o, tag)
         val opTag = safeToTaggable(o)
@@ -33,9 +40,9 @@ object Tag {
             val target = TagInterceptor(thisSafe)
             val tagClass: Class<out T> = ByteBuddy()
                 .subclass(o.javaClass)
-                .suffix("\$tagged")
-                .defineField("original", o.javaClass, Visibility.PUBLIC)
-                .defineField("tag", TagName::class.java, Visibility.PUBLIC)
+                .suffix("tagged")
+                .defineField(FIELD_ORIGINAL, o.javaClass, Visibility.PUBLIC)
+                .defineField(FIELD_TAG, TagName::class.java, Visibility.PUBLIC)
                 .implement(Taggable::class.java)
                 .method(ElementMatchers.any())
                 .intercept(MethodDelegation.withDefaultConfiguration().to(target))
@@ -44,16 +51,14 @@ object Tag {
                 .loaded
             val objenesis: Objenesis = ObjenesisStd()
             val newInstance = objenesis.getInstantiatorOf(tagClass).newInstance()
-            try {
-                tagClass.getDeclaredField("original")[newInstance] = o
-                tagClass.getDeclaredField("tag")[newInstance] = tag
-            } catch (e: NoSuchFieldException) {
-                e.printStackTrace()
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-            }
+            injectFields(tagClass, newInstance, o, tag)
             newInstance
         }
+    }
+
+    private fun <T : Any> injectFields(tagClass: Class<out T>, newInstance: T, original: T, tag: TagName) {
+        tagClass.getDeclaredField(FIELD_ORIGINAL)[newInstance] = original
+        tagClass.getDeclaredField(FIELD_TAG)[newInstance] = tag
     }
 
     @JvmStatic

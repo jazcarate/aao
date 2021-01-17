@@ -14,7 +14,7 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
     private val logger = LoggerFactory.getLogger(TagInterceptor::class.java)
 
     @RuntimeType
-    @Throws(Exception::class)
+    @Suppress("UNUSED")
     fun intercept(@Origin method: Method, @AllArguments args: Array<Any?>): Any? {
         return when (method.name) {
             "getTag" -> safeTag.tag
