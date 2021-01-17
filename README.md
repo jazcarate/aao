@@ -2,18 +2,6 @@
 
 ## [Apples and oranges](https://en.wikipedia.org/wiki/Apples_and_oranges)
 
-+ [Why?](#why-)
-+ [Usage](#usage)
-+ [Opting out](#opting-out)
-+ [“Zero-Cost Abstraction”](#-zero-cost-abstraction-)
-+ [Import](#import)
-+ [Tag laws](#tag-laws)
-+ [Why wouldn't you just `X`](#why-wouldn-t-you-just--x-)
-    - [Model your domain cases](#model-your-domain-cases)
-    - [Inline classes](#inline-classes)
-+ [Limitations](#limitations)
-+ [TODO](#todo)
-
 
 ```kotlin
 val fiveApples: BigDecimal = tag(BigDecimal(5), "apple")
@@ -26,6 +14,18 @@ threeApples + fiveApples // BigDecimal(8)
 // But can't add apples and oranges
 fiveApples + fiveOranges // IncompatibleTagsException: Tags are incompatible between 'apple' and the arguments ['orange']
 ```
+
++ [Why?](#why)
++ [Usage](#usage)
++ [Opting out](#opting-out)
++ [“Zero-Cost Abstraction”](#zero-cost-abstraction)
++ [Import](#import)
++ [Tag laws](#tag-laws)
++ [Why wouldn't you just `X`](#why-wouldnt-you-just-x)
+    - [Model your domain cases](#model-your-domain-cases)
+    - [Inline classes](#inline-classes)
++ [Limitations](#limitations)
++ [TODO](#todo)
 
 ### Why?
 
@@ -48,11 +48,11 @@ class SomeComputation {
 }
 ```
 
-(Refer to [Why wouldn't you just `X`](#why-wouldn-t-you-just--x-) to see other alternatives that were considered)
+(Refer to [Why wouldn't you just `X`](#why-wouldnt-you-just-x) to see other alternatives that were considered)
 
 ### Usage
 
-_You can find a Worksheet to try it out yourselves at `src/main/kotlin/ar/com/florius/aao/Try.ws.kts`._
+_You can find a Worksheet to try it out yourselves at `src/main/kotlin/Try.ws.kts`._
 
 We basically try to replace comments, for code.
 
@@ -91,8 +91,8 @@ inline fun <T : Any> tag(o: T, _: String) = o
 
 ### Tag laws
 
-**Topless [joined semilattice](https://en.wikipedia.org/wiki/Semilattice)** is the name of the game when it comes to
-tag. There are three “layers” of semilattices interactinv in tags. In reverse order of application:
+**[Joined semilattice](https://en.wikipedia.org/wiki/Semilattice)** is the name of the game when it comes to
+tag. There are three “layers” of semilattices interacting in tags. In reverse order of application:
 
 1. **`TagName`** A string representation of the tag itself, where dissimilar values yield ⊤
 1. **`Breadcrumb`** A ordered set of `TagName` that are joined by position wise join, where an intermediate ⊤ _bubbles_
@@ -168,7 +168,7 @@ Cannot tag primitive, array or final types. (because JVM rules)
 
 ### TODO
 
-- [] A way to explicity ignore tags
+- [] A way to explicitly ignore tags
 - [] zero cost in production
 - [] On creation and on operation, copy all the values from the target to the sublassed object (to get arround things
   that go directly to fields, and not methods)
