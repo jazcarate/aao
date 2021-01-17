@@ -1,6 +1,9 @@
-target/
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+.gradle
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+**/build/
 .idea/
 *.iml
 .jqwik-*
