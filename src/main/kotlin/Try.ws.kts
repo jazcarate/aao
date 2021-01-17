@@ -1,5 +1,3 @@
-package ar.com.florius.aao
-
 import ar.com.florius.aao.Tag.tag
 import java.math.BigDecimal
 

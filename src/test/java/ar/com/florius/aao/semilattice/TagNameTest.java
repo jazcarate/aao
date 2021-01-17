@@ -1,10 +1,11 @@
 package ar.com.florius.aao.semilattice;
 
-import net.jqwik.api.*;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Group;
+import net.jqwik.api.Property;
 import net.jqwik.api.constraints.Size;
 import net.jqwik.api.constraints.Unique;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,44 +32,27 @@ class TagNameTest {
         assertEquals(tag1.join(tag2), new TagName.Tagged(tag));
     }
 
-    @Provide
-    public Arbitrary<TagName> tag() {
-        return Arbitraries.oneOf(Arrays.asList(
-                Arbitraries.strings().map(TagName.Tagged::new),
-                Arbitraries.create(() -> TagName.NoTag.INSTANCE),
-                Arbitraries.create(() -> TagName.Incompatible.INSTANCE)
-        ));
-    }
-
     @Group
     class Semilattice {
 
         @Property
-        void associativity(
-                @ForAll("tag") TagName tag1, @ForAll("tag") TagName tag2, @ForAll("tag") TagName tag3
-        ) {
-            sl.associativity(tag1, tag2, tag3);
+        void associativity(@ForAll TagName x, @ForAll TagName y, @ForAll TagName z) {
+            sl.associativity(x, y, z);
         }
 
         @Property
-        void commutativity(
-                @ForAll("tag") TagName tag1, @ForAll("tag") TagName tag2
-        ) {
-            sl.commutativity(tag1, tag2);
+        void commutativity(@ForAll TagName x, @ForAll TagName y) {
+            sl.commutativity(x, y);
         }
 
         @Property
-        void idempotency(
-                @ForAll("tag") TagName tag1
-        ) {
-            sl.idempotency(tag1);
+        void idempotency(@ForAll TagName x) {
+            sl.idempotency(x);
         }
 
         @Property
-        void identity(
-                @ForAll("tag") TagName tag1
-        ) {
-            sl.identity(tag1);
+        void identity(@ForAll TagName x) {
+            sl.identity(x);
         }
 
     }

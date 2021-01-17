@@ -5,8 +5,6 @@ import ar.com.florius.aao.shapes.State;
 import ar.com.florius.aao.shapes.Unary;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-
 import static ar.com.florius.aao.Tag.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -1,43 +1,32 @@
 package ar.com.florius.aao.semilattice
 
-import ar.com.florius.aao.IncompatibleTagsException
+import kotlin.math.max
 
 
 sealed class Breadcrumb {
     abstract fun join(a: Breadcrumb): Breadcrumb
 
-    data class Tagged(private val name: List<String>) : Breadcrumb() {
+    data class Tagged(private val names: List<TagName>) : Breadcrumb() {
 
-        constructor(name: String) : this(name.split(":"))
+        constructor(name: String) : this(name.split(":").map {
+            if (it.isEmpty()) TagName.NoTag else TagName.Tagged(it)
+        })
 
         override fun join(a: Breadcrumb): Breadcrumb {
             return when (a) {
-                is Tagged -> {
-                    try {
-                        Tagged(joinGo(name, a.name, 0))
-                    } catch (e: IncompatibleTagsException) {
-                        return Incompatible
-                    }
-                }
+                is Tagged -> joinGo(names, a.names)
                 else -> a.join(this)
             }
         }
 
-        private fun joinGo(x: List<String>, y: List<String>, level: Int): List<String> {
-            if (x.isEmpty() && y.isEmpty()) return emptyList()
-            if (x.isEmpty()) return y
-            if (y.isEmpty()) return x
+        private fun joinGo(x: List<TagName>, y: List<TagName>): Breadcrumb {
+            val max = max(x.size, y.size)
+            val filledX = fill(x, max, TagName.NoTag)
+            val filledY = fill(y, max, TagName.NoTag)
 
-            val (x1, xs) = uncons(x)
-            val (y1, ys) = uncons(y)
-            if (x1 == y1) return listOf(x1) + joinGo(xs, ys, level + 1)
-            throw IncompatibleTagsException("$x is incompatible with $y at level $level of $name")
-        }
-    }
-
-    object NoTag : Breadcrumb() {
-        override fun join(a: Breadcrumb): Breadcrumb {
-            return a
+            val newTagNames = filledX.zip(filledY) { a, b -> a.join(b) }
+            if (newTagNames.any { it is TagName.Incompatible }) return Incompatible
+            return Tagged(newTagNames)
         }
     }
 
@@ -45,5 +34,10 @@ sealed class Breadcrumb {
         override fun join(a: Breadcrumb): Breadcrumb {
             return this
         }
+    }
+
+    companion object {
+        @JvmStatic
+        val min: Breadcrumb = Tagged(emptyList())
     }
 }
