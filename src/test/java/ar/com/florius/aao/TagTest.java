@@ -1,6 +1,6 @@
 package ar.com.florius.aao;
 
-import ar.com.florius.aao.semilattice.TagName;
+import ar.com.florius.aao.semilattice.Namespace;
 import ar.com.florius.aao.shapes.State;
 import ar.com.florius.aao.shapes.Unary;
 import org.junit.jupiter.api.Test;
@@ -15,11 +15,11 @@ class TagTest {
 
     @Test
     void tagging_get_tags() {
-        TagName aTag = new TagName.Tagged("foo");
+        String aTag = "foo";
 
         State<Integer> taggedState = tag(new State<>(3), aTag);
 
-        assertEquals(getTag(taggedState), aTag);
+        assertEquals(getTag(taggedState), Namespace.of(aTag));
     }
 
     @Test
@@ -41,13 +41,13 @@ class TagTest {
 
     @Test
     void tag_an_already_tagged_thing() {
-        TagName aTag = new TagName.Tagged("foo");
+        String aTag = "foo";
 
         State<Integer> taggedState = tag(new State<>(3), aTag);
         State<Integer> reTaggedState = tag(taggedState, aTag);
 
-        assertEquals(getTag(taggedState), aTag);
-        assertEquals(getTag(reTaggedState), aTag);
+        assertEquals(getTag(taggedState), Namespace.of(aTag));
+        assertEquals(getTag(reTaggedState), Namespace.of(aTag));
         assertEquals(taggedState, reTaggedState);
     }
 
@@ -61,33 +61,33 @@ class TagTest {
 
     @Test
     void result_of_tag_is_tagged_with_the_parent() {
-        TagName aTag = new TagName.Tagged("foo");
+        String aTag = "foo";
         State<State<Integer>> taggedState = tag(new State<>(new State<>(3)), aTag);
 
-        assertEquals(getTag(taggedState.get()), aTag);
+        assertEquals(getTag(taggedState.get()), Namespace.of(aTag));
     }
 
     @Test
     void tagged_can_interact_with_untagged_and_result_is_tagged() {
-        TagName aTag = new TagName.Tagged("foo");
+        String aTag = "foo";
         Unary taggedUnary = tag(new Unary(), aTag);
 
         State<Integer> result = new State<>(3);
         State<Integer> operated = taggedUnary.operate(result);
 
         assertEquals(operated, result);
-        assertEquals(getTag(operated), aTag);
+        assertEquals(getTag(operated), Namespace.of(aTag));
     }
 
     @Test
     void tagged_can_interact_with_same_tag_and_result_is_tagged() {
-        TagName aTag = new TagName.Tagged("foo");
+        String aTag = "foo";
         Unary taggedUnary = tag(new Unary(), aTag);
 
         State<Integer> result = tag(new State<>(3), aTag);
         State<Integer> operated = taggedUnary.operate(result);
 
-        assertEquals(getTag(operated), aTag);
+        assertEquals(getTag(operated), Namespace.of(aTag));
         assertEquals(operated, result);
     }
 
@@ -112,5 +112,8 @@ class TagTest {
         assertEquals(Optional.empty(), safeToTaggable(taggedUnary));
         assertEquals(Optional.empty(), safeToTaggable(result));
         assertEquals(Optional.empty(), safeToTaggable(operated));
+
+
+        this.getClass().getClassLoader().setDefaultAssertionStatus(true);
     }
 }

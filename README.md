@@ -163,6 +163,7 @@ inline class WithoutTax(private val value: BigDecimal) {
     fun valueWithTax() = value * tax
 }
 
+@Suppress("RedundantExplicitType")
 class SomeComputation {
     fun calculateTotal(): BigDecimal {
         val toll: WithTax = WithTax(dataFromSomeService.getTollValue())
@@ -188,6 +189,3 @@ fun <T : Any> tag(o: T, tag: String): T
 ### TODO
 
 - [] A way to explicitly ignore tags
-- [] zero cost in production
-- [] On creation and on operation, copy all the values from the target to the sublassed object (to get arround things
-  that go directly to fields, and not methods)

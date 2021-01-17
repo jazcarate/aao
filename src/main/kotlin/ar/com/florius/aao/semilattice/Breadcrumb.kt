@@ -2,9 +2,7 @@ package ar.com.florius.aao.semilattice
 
 import kotlin.math.max
 
-
-sealed class Breadcrumb {
-    abstract fun join(a: Breadcrumb): Breadcrumb
+sealed class Breadcrumb : Semilattice<Breadcrumb> {
 
     data class Tagged(private val names: List<TagName>) : Breadcrumb() {
 

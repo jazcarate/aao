@@ -1,2 +1,3 @@
 ar.com.florius.aao.semilattice.BreadcrumbArbitraryProvider
 ar.com.florius.aao.semilattice.TagNameArbitraryProvider
+ar.com.florius.aao.semilattice.NamespaceArbitraryProvider

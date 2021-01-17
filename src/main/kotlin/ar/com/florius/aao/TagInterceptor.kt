@@ -1,7 +1,7 @@
 package ar.com.florius.aao
 
 import ar.com.florius.aao.Tag.tag
-import ar.com.florius.aao.semilattice.TagName
+import ar.com.florius.aao.semilattice.Namespace
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.implementation.bind.annotation.AllArguments
 import net.bytebuddy.implementation.bind.annotation.Origin
@@ -25,9 +25,9 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
 
     @Throws(IllegalAccessException::class, InvocationTargetException::class)
     private fun dispatch(method: Method, args: Array<Any?>): Any? {
-        val argsTag: List<TagName> = args
-            .map { obj -> Tag.safeToTaggable(obj) }
-            .map { objectTaggable -> objectTaggable.map { it.tag }.orElse(TagName.NoTag) }
+        val argsTag: List<Namespace> = args
+            .map { obj -> Tag.safeToTaggable<Any?, Namespace>(obj) }
+            .map { objectTaggable -> objectTaggable.map { it.tag }.orElse(Namespace.min) }
         val newTag = safeTag.operate(argsTag)
 
         val result = method.invoke(safeTag.value, *unwrap(args))
@@ -42,6 +42,6 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
     }
 
     private fun unwrap(args: Array<Any?>): Array<Any?> {
-        return args.map { if (it is Taggable<*>) it.value else it }.toTypedArray()
+        return args.map { if (it is Taggable<*, *>) it.value else it }.toTypedArray()
     }
 }

@@ -1,6 +1,6 @@
 package ar.com.florius.aao;
 
-import ar.com.florius.aao.semilattice.TagName;
+import ar.com.florius.aao.semilattice.Namespace;
 import ar.com.florius.aao.shapes.State;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ class SafeTagTest {
 
     @Test
     void tagging_get_tags() {
-        TagName.Tagged tag = new TagName.Tagged("foo");
+        Namespace tag = Namespace.of("foo");
         SafeTag<State<Integer>> foo = new SafeTag<>(new State<>(3), tag);
 
         assertEquals(getTag(foo), tag);
@@ -24,15 +24,15 @@ class SafeTagTest {
     @Test
     void tagging_get_value() {
         State<Integer> value = new State<>(3);
-        SafeTag<State<Integer>> foo = new SafeTag<>(value, new TagName.Tagged("foo"));
+        SafeTag<State<Integer>> foo = new SafeTag<>(value, Namespace.of("foo"));
 
         assertEquals(untag(foo), value);
     }
 
     @Test
     void operate_with_another_tag() {
-        SafeTag<State<Integer>> foo = new SafeTag<>(new State<>(3), new TagName.Tagged("foo"));
-        TagName barTag = new TagName.Tagged("bar");
+        SafeTag<State<Integer>> foo = new SafeTag<>(new State<>(3), Namespace.of("foo"));
+        Namespace barTag = Namespace.of("bar");
 
 
         assertThrows(IncompatibleTagsException.class, () -> foo.operate(List.of(barTag)));

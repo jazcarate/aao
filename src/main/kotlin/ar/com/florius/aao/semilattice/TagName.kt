@@ -1,8 +1,7 @@
 package ar.com.florius.aao.semilattice
 
 
-sealed class TagName {
-    abstract fun join(a: TagName): TagName
+sealed class TagName : Semilattice<TagName> {
 
     data class Tagged(private val name: String) : TagName() {
         override fun join(a: TagName): TagName {
