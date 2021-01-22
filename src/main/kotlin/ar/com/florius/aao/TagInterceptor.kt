@@ -30,7 +30,7 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
             .map { objectTaggable -> objectTaggable.map { it.tag }.orElse(Namespace.min) }
         val newTag = safeTag.operate(argsTag)
 
-        val result = method.invoke(safeTag.value, *unwrap(args))
+        val result = method.invoke(safeTag.value, *args)
         val resultType = TypeDescription.ForLoadedType.of(result.javaClass)
 
         return if (resultType.isPrimitive || resultType.isArray || resultType.isFinal) {
@@ -39,9 +39,5 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
         } else {
             tag(result, newTag)
         }
-    }
-
-    private fun unwrap(args: Array<Any?>): Array<Any?> {
-        return args.map { if (it is Taggable<*, *>) it.value else it }.toTypedArray()
     }
 }
