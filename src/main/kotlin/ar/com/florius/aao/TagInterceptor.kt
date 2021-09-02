@@ -2,6 +2,7 @@ package ar.com.florius.aao
 
 import ar.com.florius.aao.Tag.tag
 import ar.com.florius.aao.semilattice.Namespace
+import ar.com.florius.aao.strict.Tag.safeToTaggable
 import net.bytebuddy.description.type.TypeDescription
 import net.bytebuddy.implementation.bind.annotation.AllArguments
 import net.bytebuddy.implementation.bind.annotation.Origin
@@ -26,7 +27,7 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
     @Throws(IllegalAccessException::class, InvocationTargetException::class)
     private fun dispatch(method: Method, args: Array<Any?>): Any? {
         val argsTag: List<Namespace> = args
-            .map { obj -> Tag.safeToTaggable<Any?, Namespace>(obj) }
+            .map { obj -> safeToTaggable<Any?, Namespace>(obj) }
             .map { objectTaggable -> objectTaggable.map { it.tag }.orElse(Namespace.min) }
         val newTag = safeTag.operate(argsTag)
 

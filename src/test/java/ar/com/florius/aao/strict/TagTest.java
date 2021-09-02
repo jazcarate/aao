@@ -1,13 +1,12 @@
-package ar.com.florius.aao;
+package ar.com.florius.aao.strict;
 
+import ar.com.florius.aao.IncompatibleTagsException;
 import ar.com.florius.aao.semilattice.Namespace;
 import ar.com.florius.aao.shapes.State;
 import ar.com.florius.aao.shapes.Unary;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
-import static ar.com.florius.aao.Tag.*;
+import static ar.com.florius.aao.strict.Tag.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -97,23 +96,5 @@ class TagTest {
         State<Integer> result = tag(new State<>(3), "bar");
 
         assertThrows(IncompatibleTagsException.class, () -> taggedUnary.operate(result));
-    }
-
-    @Test
-    void can_disable_assertions_on_production_code() {
-        this.getClass().getClassLoader().setDefaultAssertionStatus(false);
-
-        Unary taggedUnary = tag(new Unary(), "foo");
-        State<Integer> result = tag(new State<>(3), "bar");
-
-
-        State<Integer> operated = taggedUnary.operate(result);
-        assertEquals(operated, result);
-        assertEquals(Optional.empty(), safeToTaggable(taggedUnary));
-        assertEquals(Optional.empty(), safeToTaggable(result));
-        assertEquals(Optional.empty(), safeToTaggable(operated));
-
-
-        this.getClass().getClassLoader().setDefaultAssertionStatus(true);
     }
 }
