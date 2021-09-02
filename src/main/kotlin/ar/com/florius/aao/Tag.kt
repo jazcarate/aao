@@ -25,7 +25,7 @@ object Tag {
 
     @JvmStatic
     fun <T : Any> tag(o: T, tag: Namespace): T {
-        if (!o.javaClass.desiredAssertionStatus()) {
+        if (!areAssertEnabled()) {
             return o
         }
 
@@ -55,6 +55,16 @@ object Tag {
             injectFields(tagClass, newInstance, o, tag)
             newInstance
         }
+    }
+
+    private fun areAssertEnabled(): Boolean {
+        var assertEnabled = false
+        try {
+            assert(false)
+        } catch (e: AssertionError) {
+            assertEnabled = true
+        }
+        return assertEnabled
     }
 
     private fun <T : Any> injectFields(tagClass: Class<out T>, newInstance: T, original: T, tag: Namespace) {

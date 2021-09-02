@@ -11,6 +11,7 @@ sealed class Namespace : Semilattice<Namespace> {
             }
         }
 
+
         private fun joinGo(x: Map<String, Breadcrumb>, y: Map<String, Breadcrumb>): Namespace {
             val candidate = merge(x, y)
             if (candidate.any { it.value is Breadcrumb.Incompatible }) return Incompatible
@@ -23,6 +24,10 @@ sealed class Namespace : Semilattice<Namespace> {
                 .mapValues { (_, values) ->
                     values.foldRight(values.first(), { a, b -> a.join(b) })
                 }
+        }
+
+        override fun toString(): String {
+            return "«$map»"
         }
     }
 

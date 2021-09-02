@@ -10,6 +10,10 @@ sealed class TagName : Semilattice<TagName> {
                 else -> a.join(this)
             }
         }
+
+        override fun toString(): String {
+            return name
+        }
     }
 
     object Incompatible : TagName() {

@@ -26,6 +26,10 @@ sealed class Breadcrumb : Semilattice<Breadcrumb> {
             if (newTagNames.any { it is TagName.Incompatible }) return Incompatible
             return Tagged(newTagNames)
         }
+
+        override fun toString(): String {
+            return names.joinToString(":")
+        }
     }
 
     object Incompatible : Breadcrumb() {
