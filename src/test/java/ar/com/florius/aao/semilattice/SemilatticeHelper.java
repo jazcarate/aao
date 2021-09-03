@@ -46,6 +46,6 @@ public class SemilatticeHelper<T> {
         assertEquals(
                 join.apply(x, this.identityElement),
                 x,
-                x.toString() + " is not the idendity element");
+                x.toString() + " is not the identity element");
     }
 }

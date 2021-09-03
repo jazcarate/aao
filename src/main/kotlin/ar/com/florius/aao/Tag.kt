@@ -1,12 +1,9 @@
 package ar.com.florius.aao
 
 import ar.com.florius.aao.semilattice.Namespace
-import org.slf4j.LoggerFactory
 import ar.com.florius.aao.strict.Tag.tag as strictTag
 
 object Tag {
-    private val logger = LoggerFactory.getLogger(Tag::class.java)
-
     @JvmStatic
     fun <T : Any> tag(o: T, tag: String): T {
         return tag(o, Namespace.of(tag))

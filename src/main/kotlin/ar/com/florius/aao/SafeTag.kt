@@ -6,7 +6,9 @@ class SafeTag<T>(override val value: T, override val tag: Namespace) : Taggable<
     fun operate(argsTag: List<Namespace>): Namespace {
         val newTag = argsTag.stream().reduce(this.tag) { obj: Namespace, a: Namespace -> obj.join(a) }
         if (isIncompatible(newTag)) {
-            throw IncompatibleTagsException("Tags are incompatible between this (" + this.tag + ") and the arguments (" + argsTag + ")")
+            throw IncompatibleTagsException("Tags are incompatible between this «${this.tag}» and the arguments: ${
+                argsTag.withIndex().joinToString(", ") { "${it.index}: «${it.value}»" }
+            })")
         }
         return newTag
     }

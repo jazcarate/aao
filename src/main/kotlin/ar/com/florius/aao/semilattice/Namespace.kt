@@ -27,7 +27,7 @@ sealed class Namespace : Semilattice<Namespace> {
         }
 
         override fun toString(): String {
-            return "«$map»"
+            return map.entries.joinToString(", ") { "${it.key}->${it.value}" }
         }
     }
 
@@ -45,6 +45,7 @@ sealed class Namespace : Semilattice<Namespace> {
         @JvmStatic
         fun of(map: String): Namespace {
             return map.split(",")
+                .map(String::trim)
                 .map {
                     val split = it.split("->", limit = 2)
                     if (split.isEmpty()) return@map Tagged(emptyMap())
