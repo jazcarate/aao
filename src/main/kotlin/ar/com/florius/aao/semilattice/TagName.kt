@@ -11,21 +11,19 @@ sealed class TagName : Semilattice<TagName> {
             }
         }
 
-        override fun toString(): String {
-            return name
-        }
+        override fun toString(): String = name
     }
 
     object Incompatible : TagName() {
-        override fun join(a: TagName): TagName {
-            return this
-        }
+        override fun join(a: TagName): TagName = this
+
+        override fun toString(): String = "⊤"
     }
 
     object NoTag : TagName() {
-        override fun join(a: TagName): TagName {
-            return a
-        }
+        override fun join(a: TagName): TagName = a
+
+        override fun toString(): String = "⊥"
     }
 
 }

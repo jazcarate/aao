@@ -26,15 +26,14 @@ sealed class Namespace : Semilattice<Namespace> {
                 }
         }
 
-        override fun toString(): String {
-            return map.entries.joinToString(", ") { "${it.key}->${it.value}" }
-        }
+        override fun toString(): String =
+            map.entries.joinToString(", ") { "${it.key}->${it.value}" }
     }
 
     object Incompatible : Namespace() {
-        override fun join(a: Namespace): Namespace {
-            return this
-        }
+        override fun join(a: Namespace): Namespace = this
+
+        override fun toString(): String = "⊤"
     }
 
     companion object {

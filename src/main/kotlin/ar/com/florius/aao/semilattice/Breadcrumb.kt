@@ -27,15 +27,13 @@ sealed class Breadcrumb : Semilattice<Breadcrumb> {
             return Tagged(newTagNames)
         }
 
-        override fun toString(): String {
-            return names.joinToString(":")
-        }
+        override fun toString(): String = names.joinToString(":")
     }
 
     object Incompatible : Breadcrumb() {
-        override fun join(a: Breadcrumb): Breadcrumb {
-            return this
-        }
+        override fun join(a: Breadcrumb): Breadcrumb = this
+
+        override fun toString(): String = "⊤"
     }
 
     companion object {
