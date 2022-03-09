@@ -26,19 +26,24 @@ class TagInterceptor<T>(private val safeTag: SafeTag<T>) {
 
     @Throws(IllegalAccessException::class, InvocationTargetException::class)
     private fun dispatch(method: Method, args: Array<Any?>): Any? {
-        val argsTag: List<Namespace> = args
-            .map { obj -> safeToTaggable<Any?, Namespace>(obj) }
-            .map { objectTaggable -> objectTaggable.map { it.tag }.orElse(Namespace.min) }
-        val newTag = safeTag.operate(argsTag)
+        val argsTag: List<Taggable<Any?, Namespace>> = args
+            .map { obj -> safeToTaggable<Any?, Namespace>(obj).orElse(SafeTag(obj, Namespace.min)) }
 
-        val result = method.invoke(safeTag.value, *args)
-        val resultType = TypeDescription.ForLoadedType.of(result.javaClass)
-
-        return if (resultType.isPrimitive || resultType.isArray || resultType.isFinal) {
-            logger.warn("Cannot tag primitive, array or final types ({}). Returning untagged ({})", resultType, result)
-            result
-        } else {
-            tag(result, newTag)
+        val result = safeTag.apply(method, argsTag)
+        if (result.tag == Namespace.Incompatible) {
+            throw IncompatibleTagsException(result, argsTag)
         }
+
+        val resultType = result.value?.let { TypeDescription.ForLoadedType.of(it.javaClass) }
+
+        if (resultType == null || resultType.isPrimitive || resultType.isArray || resultType.isFinal) {
+            logger.warn(
+                "Cannot tag null, primitive, array or final types ({}). Returning untagged ({})",
+                resultType,
+                result
+            )
+            return result.value
+        }
+        return tag(result.value, result.tag)
     }
 }

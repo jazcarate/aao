@@ -1,5 +1,8 @@
 package ar.com.florius.aao
 
-import java.lang.IllegalArgumentException
+import ar.com.florius.aao.semilattice.Namespace
 
-class IncompatibleTagsException(message: String?) : IllegalArgumentException(message)
+class IncompatibleTagsException(result: SafeTag<Any?>, argsTag: List<Taggable<Any?, Namespace>>) :
+    IllegalArgumentException("Tags are incompatible between this «${result.tag}» and the arguments: ${
+        argsTag.withIndex().joinToString(", ") { "${it.index + 1}: «${it}»" }
+    }")

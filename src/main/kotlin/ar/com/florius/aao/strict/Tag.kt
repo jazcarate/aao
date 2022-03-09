@@ -29,15 +29,14 @@ object Tag {
     @JvmStatic
     fun <T : Any> tag(o: T, tag: Namespace): T {
         logger.trace("Tagging <{}> in {} with <{}>", o, o.javaClass.simpleName, tag)
-        val thisSafe = SafeTag(o, tag)
         val opTag = safeToTaggable<T, Namespace>(o)
         return if (opTag.isPresent) {
             val taggable = opTag.get()
             logger.trace("Already tagged with <{}>", taggable.tag)
-            val newTag = thisSafe.operate(listOf(taggable.tag))
+            val newTag = tag.join(taggable.tag)
             tag(taggable.value, newTag)
         } else {
-            val target = TagInterceptor(thisSafe)
+            val target = TagInterceptor(SafeTag(o, tag))
             val tagClass: Class<out T> = ByteBuddy()
                 .subclass(o.javaClass)
                 .suffix("tagged")

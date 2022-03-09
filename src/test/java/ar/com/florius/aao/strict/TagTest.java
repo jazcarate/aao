@@ -51,11 +51,11 @@ class TagTest {
     }
 
     @Test
-    void cant_tag_an_already_tagged_thing_with_another_different_tag() {
-
+    void cant_retag_an_already_tagged_thing_with_another_different_tag_to_yeild_an_incompatible() {
         State<Integer> taggedState = tag(new State<>(3), "foo");
+        State<Integer> retagged = tag(taggedState, "bar");
 
-        assertThrows(IncompatibleTagsException.class, () -> tag(taggedState, "bar"));
+        assertThrows(IncompatibleTagsException.class, retagged::get);
     }
 
     @Test
