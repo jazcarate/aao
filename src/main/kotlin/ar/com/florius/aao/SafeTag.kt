@@ -8,7 +8,7 @@ class SafeTag<T>(override val value: T, override val tag: Namespace) : Taggable<
         if (isIncompatible(newTag)) {
             throw IncompatibleTagsException("Tags are incompatible between this «${this.tag}» and the arguments: ${
                 argsTag.withIndex().joinToString(", ") { "${it.index}: «${it.value}»" }
-            })")
+            }")
         }
         return newTag
     }
